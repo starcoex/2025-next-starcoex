@@ -1,0 +1,10 @@
+schema:
+  - "http://localhost:3100/graphql"
+documents:
+  - "./app/graphql/**/*.{tsx,ts}"
+generates:
+  ./generated/graphql.ts:
+    plugins:
+      - typescript
+      - typescript-operations
+      - typescript-react-apollo
