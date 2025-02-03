@@ -11,7 +11,8 @@ import {
 import { Avatar } from "@mui/material";
 import Link from "next/link";
 import { CgProfile } from "react-icons/cg";
-import Login from "@/app/auth/login/Login";
+import useMe from "@/app/hooks/useMe";
+import getUser from "@/app/lib/get-user";
 
 export const solutions = [
   {
@@ -33,11 +34,14 @@ export const solutions = [
 ];
 
 const ProfileDropDown = () => {
+  const { meGql, loading } = useMe();
+  console.log("meGql", meGql);
   const [login, setLogin] = useState(false);
   const [open, setOpen] = useState(false);
   const logoutHandler = () => {
     window.location.reload();
   };
+
   return (
     <div className="relative flex justify-center items-center gap-6 px-4">
       {login ? (

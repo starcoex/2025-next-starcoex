@@ -9,6 +9,8 @@ export const CREATE_USER_GQL = gql`
       ok
       error
       refresh_token
+      activation_code
+      activation_token
       user {
         name
         email

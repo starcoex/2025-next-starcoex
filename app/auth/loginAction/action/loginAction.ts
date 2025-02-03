@@ -11,8 +11,6 @@ const loginAction = async (_preState: any, formData: FormData) => {
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify(Object.fromEntries(formData)),
   });
-  console.log(response);
-  // const json = await response.json();
   if (!response.ok) {
     const json = await response.json();
     if (response.status === 401) {
@@ -25,11 +23,13 @@ const loginAction = async (_preState: any, formData: FormData) => {
   }
 
   const cookie = getAuthCookie(response);
-  if (cookie?.accessToken) {
-    (await cookies()).set(cookie.accessToken);
+  const cookieStore = await cookies();
+
+  if (cookie?.access_token) {
+    cookieStore.set(cookie.access_token);
   }
-  if (cookie?.refreshToken) {
-    (await cookies()).set(cookie.refreshToken);
+  if (cookie?.refresh_token) {
+    cookieStore.set(cookie.refresh_token);
   }
   redirect("/");
 };

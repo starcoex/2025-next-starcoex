@@ -6,29 +6,29 @@ export const getAuthCookie = (response: Response) => {
   if (!setCookieHeader) {
     return;
   }
-  const accessToken = setCookieHeader
+  const access_token = setCookieHeader
     .split(";")
     .find((cookie) => cookie.includes(AUTH_COOKIE))
     ?.split("=")[1];
-  const refreshToken = setCookieHeader
+  const refresh_token = setCookieHeader
     .split(";")
     .find((cookie) => cookie.includes(REFRESH_COOKIE))
     ?.split("=")[1];
 
   return {
-    accessToken: accessToken && {
+    access_token: access_token && {
       name: AUTH_COOKIE,
-      value: accessToken ? accessToken : "",
+      value: access_token,
       secure: true,
       httpOnly: true,
-      expires: new Date(jwtDecode(accessToken).exp! * 1000),
+      expires: new Date(jwtDecode(access_token).exp! * 1000),
     },
-    refreshToken: refreshToken && {
+    refresh_token: refresh_token && {
       name: REFRESH_COOKIE,
-      value: accessToken ? accessToken : "",
+      value: refresh_token,
       secure: true,
       httpOnly: true,
-      expires: new Date(jwtDecode(refreshToken).exp! * 1000),
+      expires: new Date(jwtDecode(refresh_token).exp! * 1000),
     },
   };
 };

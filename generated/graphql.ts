@@ -16,6 +16,9 @@ export type Scalars = {
   Int: { input: number; output: number; }
   Float: { input: number; output: number; }
   DateTime: { input: any; output: any; }
+  _Any: { input: any; output: any; }
+  federation__FieldSet: { input: any; output: any; }
+  link__Import: { input: any; output: any; }
 };
 
 export type Avatars = {
@@ -28,26 +31,10 @@ export type Avatars = {
   userId: Scalars['Int']['output'];
 };
 
-export type CardInput = {
-  cvc: Scalars['String']['input'];
-  expMonth: Scalars['Float']['input'];
-  expYear: Scalars['Float']['input'];
-  number: Scalars['String']['input'];
-};
-
-export type CreateChargeInput = {
-  amount: Scalars['Float']['input'];
-  card: CardInput;
-};
-
-export type CreatePaymentInput = {
-  impUid?: InputMaybe<Scalars['String']['input']>;
-};
-
-export type CreateReservationInput = {
-  endDate: Scalars['DateTime']['input'];
-  payment: CreateChargeInput;
-  startDate: Scalars['DateTime']['input'];
+export type AvatarsInput = {
+  public_id: Scalars['String']['input'];
+  url: Scalars['String']['input'];
+  userId: Scalars['Int']['input'];
 };
 
 export type CreateUserInput = {
@@ -61,6 +48,8 @@ export type CreateUserInput = {
 export type CreateUserOutput = {
   __typename?: 'CreateUserOutput';
   access_token?: Maybe<Scalars['String']['output']>;
+  activation_code?: Maybe<Scalars['String']['output']>;
+  activation_token?: Maybe<Scalars['String']['output']>;
   error?: Maybe<Scalars['String']['output']>;
   ok: Scalars['Boolean']['output'];
   refresh_token?: Maybe<Scalars['String']['output']>;
@@ -81,6 +70,7 @@ export type ForgotPasswordOutput = {
 export type LoginInput = {
   email?: InputMaybe<Scalars['String']['input']>;
   password?: InputMaybe<Scalars['String']['input']>;
+  remember_me?: InputMaybe<Scalars['Boolean']['input']>;
 };
 
 export type LoginOutput = {
@@ -105,32 +95,18 @@ export type MeUserOutput = {
 
 export type Mutation = {
   __typename?: 'Mutation';
-  createPayment: Payment;
-  createReservation: Reservation;
   createUser: User;
   createUserGql: CreateUserOutput;
   forgotPassword: ForgotPasswordOutput;
   logOut: LoginOutput;
   loginGraphql: LoginOutput;
   refreshGraphql: TokensOutput;
-  removePayment: Payment;
-  removeReservation: Reservation;
+  rememberMeGql: User;
   removeUserGql: User;
+  resendVerificationCode: ResendVerificationCodeOutput;
   resetPassword: ResetPasswordOutput;
-  updatePayment: Payment;
-  updateReservation: Reservation;
   updateUserGql: UpdateOutput;
   verifyEmailGql: VerityEmailOutput;
-};
-
-
-export type MutationCreatePaymentArgs = {
-  createPaymentInput: CreatePaymentInput;
-};
-
-
-export type MutationCreateReservationArgs = {
-  createReservationInput: CreateReservationInput;
 };
 
 
@@ -161,32 +137,21 @@ export type MutationLoginGraphqlArgs = {
 
 export type MutationRefreshGraphqlArgs = {
   refresh_token: Scalars['String']['input'];
-  userId: Scalars['Float']['input'];
 };
 
 
-export type MutationRemovePaymentArgs = {
-  id: Scalars['Int']['input'];
+export type MutationRememberMeGqlArgs = {
+  rememberMeInput: UserInput;
 };
 
 
-export type MutationRemoveReservationArgs = {
-  id: Scalars['Int']['input'];
+export type MutationResendVerificationCodeArgs = {
+  resendVerificationCodeInput: ResendVerificationCodeInput;
 };
 
 
 export type MutationResetPasswordArgs = {
   resetPasswordInput: ResetPasswordInput;
-};
-
-
-export type MutationUpdatePaymentArgs = {
-  updatePaymentInput: UpdatePaymentInput;
-};
-
-
-export type MutationUpdateReservationArgs = {
-  updateReservationInput: UpdateReservationInput;
 };
 
 
@@ -199,55 +164,22 @@ export type MutationVerifyEmailGqlArgs = {
   verifyEmailInput: VerityEmailInput;
 };
 
-export type Payment = {
-  __typename?: 'Payment';
-  amount: Scalars['Float']['output'];
-  created_at: Scalars['DateTime']['output'];
-  id: Scalars['String']['output'];
-  impUid?: Maybe<Scalars['String']['output']>;
-  merchantUid: Scalars['String']['output'];
-  orderId: Scalars['String']['output'];
-  paidAt: Scalars['DateTime']['output'];
-  paymentStatus: PaymentStatus;
-};
-
-export enum PaymentStatus {
-  Cancelled = 'CANCELLED',
-  Failed = 'FAILED',
-  Paid = 'PAID',
-  Ready = 'READY'
-}
-
 export type Query = {
   __typename?: 'Query';
+  _service: _Service;
   meGql: MeUserOutput;
-  payment: Payment;
-  payments: Array<Payment>;
-  reservation: Reservation;
-  reservations: Array<Reservation>;
   user: User;
   users: Array<User>;
 };
 
-
-export type QueryPaymentArgs = {
-  id: Scalars['Int']['input'];
+export type ResendVerificationCodeInput = {
+  activation_token: Scalars['String']['input'];
 };
 
-
-export type QueryReservationArgs = {
-  id: Scalars['Int']['input'];
-};
-
-export type Reservation = {
-  __typename?: 'Reservation';
-  created_at: Scalars['DateTime']['output'];
-  endDate: Scalars['DateTime']['output'];
-  id: Scalars['Int']['output'];
-  startDate: Scalars['DateTime']['output'];
-  timestamp: Scalars['DateTime']['output'];
-  updated_at: Scalars['DateTime']['output'];
-  userId: Scalars['Int']['output'];
+export type ResendVerificationCodeOutput = {
+  __typename?: 'ResendVerificationCodeOutput';
+  error?: Maybe<Scalars['String']['output']>;
+  ok: Scalars['Boolean']['output'];
 };
 
 export type ResetPasswordInput = {
@@ -283,18 +215,6 @@ export type UpdateOutput = {
   user?: Maybe<User>;
 };
 
-export type UpdatePaymentInput = {
-  id: Scalars['Int']['input'];
-  impUid?: InputMaybe<Scalars['String']['input']>;
-};
-
-export type UpdateReservationInput = {
-  endDate?: InputMaybe<Scalars['DateTime']['input']>;
-  id: Scalars['Int']['input'];
-  payment?: InputMaybe<CreateChargeInput>;
-  startDate?: InputMaybe<Scalars['DateTime']['input']>;
-};
-
 export type User = {
   __typename?: 'User';
   access_token?: Maybe<Scalars['String']['output']>;
@@ -309,6 +229,36 @@ export type User = {
   refresh_token?: Maybe<Scalars['String']['output']>;
   roles?: Maybe<Array<Scalars['String']['output']>>;
   updated_at: Scalars['DateTime']['output'];
+  verification?: Maybe<Verification>;
+};
+
+export type UserInput = {
+  access_token?: InputMaybe<Scalars['String']['input']>;
+  avatars?: InputMaybe<AvatarsInput>;
+  email: Scalars['String']['input'];
+  name: Scalars['String']['input'];
+  password: Scalars['String']['input'];
+  passwordConfirmation?: InputMaybe<Scalars['String']['input']>;
+  phone_number: Scalars['String']['input'];
+  refresh_token?: InputMaybe<Scalars['String']['input']>;
+  roles?: InputMaybe<Array<Scalars['String']['input']>>;
+  verification?: InputMaybe<VerificationInput>;
+};
+
+export type Verification = {
+  __typename?: 'Verification';
+  activation_code: Scalars['String']['output'];
+  activation_token: Scalars['String']['output'];
+  created_at: Scalars['DateTime']['output'];
+  id: Scalars['Int']['output'];
+  updated_at: Scalars['DateTime']['output'];
+  user?: Maybe<User>;
+};
+
+export type VerificationInput = {
+  activation_code: Scalars['String']['input'];
+  activation_token: Scalars['String']['input'];
+  user?: InputMaybe<UserInput>;
 };
 
 export type VerityEmailInput = {
@@ -320,21 +270,41 @@ export type VerityEmailOutput = {
   __typename?: 'VerityEmailOutput';
   error?: Maybe<Scalars['String']['output']>;
   ok: Scalars['Boolean']['output'];
+  user?: Maybe<User>;
 };
+
+export type _Service = {
+  __typename?: '_Service';
+  sdl?: Maybe<Scalars['String']['output']>;
+};
+
+export enum Link__Purpose {
+  /** `EXECUTION` features provide metadata necessary for operation execution. */
+  Execution = 'EXECUTION',
+  /** `SECURITY` features provide metadata necessary to securely resolve fields. */
+  Security = 'SECURITY'
+}
 
 export type VerifyEmailGqlMutationVariables = Exact<{
   verifyEmailInput: VerityEmailInput;
 }>;
 
 
-export type VerifyEmailGqlMutation = { __typename?: 'Mutation', verifyEmailGql: { __typename?: 'VerityEmailOutput', ok: boolean, error?: string | null } };
+export type VerifyEmailGqlMutation = { __typename?: 'Mutation', verifyEmailGql: { __typename?: 'VerityEmailOutput', ok: boolean, error?: string | null, user?: { __typename?: 'User', name: string, email: string } | null } };
 
 export type CreateUserGqlMutationVariables = Exact<{
   createUserInput: CreateUserInput;
 }>;
 
 
-export type CreateUserGqlMutation = { __typename?: 'Mutation', createUserGql: { __typename?: 'CreateUserOutput', access_token?: string | null, ok: boolean, error?: string | null, refresh_token?: string | null, user?: { __typename?: 'User', name: string, email: string, phone_number: string } | null } };
+export type CreateUserGqlMutation = { __typename?: 'Mutation', createUserGql: { __typename?: 'CreateUserOutput', access_token?: string | null, ok: boolean, error?: string | null, refresh_token?: string | null, activation_code?: string | null, activation_token?: string | null, user?: { __typename?: 'User', name: string, email: string, phone_number: string } | null } };
+
+export type ForgotPasswordMutationVariables = Exact<{
+  forgotPasswordInput: ForgotPasswordInput;
+}>;
+
+
+export type ForgotPasswordMutation = { __typename?: 'Mutation', forgotPassword: { __typename?: 'ForgotPasswordOutput', message?: string | null, ok: boolean, error?: string | null } };
 
 export type UserQueryVariables = Exact<{ [key: string]: never; }>;
 
@@ -359,12 +329,18 @@ export type MeGqlQueryVariables = Exact<{ [key: string]: never; }>;
 export type MeGqlQuery = { __typename?: 'Query', meGql: { __typename?: 'MeUserOutput', ok: boolean, error?: string | null, user?: { __typename?: 'User', name: string, id: number, email: string, phone_number: string, refresh_token?: string | null } | null } };
 
 export type RefreshGraphqlMutationVariables = Exact<{
-  userId: Scalars['Float']['input'];
   refreshToken: Scalars['String']['input'];
 }>;
 
 
 export type RefreshGraphqlMutation = { __typename?: 'Mutation', refreshGraphql: { __typename?: 'TokensOutput', access_token?: string | null, error?: string | null, ok: boolean, refresh_token?: string | null } };
+
+export type ResendVerificationCodeMutationVariables = Exact<{
+  resendVerificationCodeInput: ResendVerificationCodeInput;
+}>;
+
+
+export type ResendVerificationCodeMutation = { __typename?: 'Mutation', resendVerificationCode: { __typename?: 'ResendVerificationCodeOutput', ok: boolean, error?: string | null } };
 
 export type CreateUserMutationVariables = Exact<{
   createUserInput: CreateUserInput;
@@ -379,6 +355,10 @@ export const VerifyEmailGqlDocument = gql`
   verifyEmailGql(verifyEmailInput: $verifyEmailInput) {
     ok
     error
+    user {
+      name
+      email
+    }
   }
 }
     `;
@@ -415,6 +395,8 @@ export const CreateUserGqlDocument = gql`
     ok
     error
     refresh_token
+    activation_code
+    activation_token
     user {
       name
       email
@@ -449,6 +431,41 @@ export function useCreateUserGqlMutation(baseOptions?: Apollo.MutationHookOption
 export type CreateUserGqlMutationHookResult = ReturnType<typeof useCreateUserGqlMutation>;
 export type CreateUserGqlMutationResult = Apollo.MutationResult<CreateUserGqlMutation>;
 export type CreateUserGqlMutationOptions = Apollo.BaseMutationOptions<CreateUserGqlMutation, CreateUserGqlMutationVariables>;
+export const ForgotPasswordDocument = gql`
+    mutation ForgotPassword($forgotPasswordInput: ForgotPasswordInput!) {
+  forgotPassword(forgotPasswordInput: $forgotPasswordInput) {
+    message
+    ok
+    error
+  }
+}
+    `;
+export type ForgotPasswordMutationFn = Apollo.MutationFunction<ForgotPasswordMutation, ForgotPasswordMutationVariables>;
+
+/**
+ * __useForgotPasswordMutation__
+ *
+ * To run a mutation, you first call `useForgotPasswordMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useForgotPasswordMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [forgotPasswordMutation, { data, loading, error }] = useForgotPasswordMutation({
+ *   variables: {
+ *      forgotPasswordInput: // value for 'forgotPasswordInput'
+ *   },
+ * });
+ */
+export function useForgotPasswordMutation(baseOptions?: Apollo.MutationHookOptions<ForgotPasswordMutation, ForgotPasswordMutationVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useMutation<ForgotPasswordMutation, ForgotPasswordMutationVariables>(ForgotPasswordDocument, options);
+      }
+export type ForgotPasswordMutationHookResult = ReturnType<typeof useForgotPasswordMutation>;
+export type ForgotPasswordMutationResult = Apollo.MutationResult<ForgotPasswordMutation>;
+export type ForgotPasswordMutationOptions = Apollo.BaseMutationOptions<ForgotPasswordMutation, ForgotPasswordMutationVariables>;
 export const UserDocument = gql`
     query User {
   user {
@@ -629,8 +646,8 @@ export type MeGqlLazyQueryHookResult = ReturnType<typeof useMeGqlLazyQuery>;
 export type MeGqlSuspenseQueryHookResult = ReturnType<typeof useMeGqlSuspenseQuery>;
 export type MeGqlQueryResult = Apollo.QueryResult<MeGqlQuery, MeGqlQueryVariables>;
 export const RefreshGraphqlDocument = gql`
-    mutation RefreshGraphql($userId: Float!, $refreshToken: String!) {
-  refreshGraphql(userId: $userId, refresh_token: $refreshToken) {
+    mutation RefreshGraphql($refreshToken: String!) {
+  refreshGraphql(refresh_token: $refreshToken) {
     access_token
     error
     ok
@@ -653,7 +670,6 @@ export type RefreshGraphqlMutationFn = Apollo.MutationFunction<RefreshGraphqlMut
  * @example
  * const [refreshGraphqlMutation, { data, loading, error }] = useRefreshGraphqlMutation({
  *   variables: {
- *      userId: // value for 'userId'
  *      refreshToken: // value for 'refreshToken'
  *   },
  * });
@@ -665,6 +681,42 @@ export function useRefreshGraphqlMutation(baseOptions?: Apollo.MutationHookOptio
 export type RefreshGraphqlMutationHookResult = ReturnType<typeof useRefreshGraphqlMutation>;
 export type RefreshGraphqlMutationResult = Apollo.MutationResult<RefreshGraphqlMutation>;
 export type RefreshGraphqlMutationOptions = Apollo.BaseMutationOptions<RefreshGraphqlMutation, RefreshGraphqlMutationVariables>;
+export const ResendVerificationCodeDocument = gql`
+    mutation ResendVerificationCode($resendVerificationCodeInput: ResendVerificationCodeInput!) {
+  resendVerificationCode(
+    resendVerificationCodeInput: $resendVerificationCodeInput
+  ) {
+    ok
+    error
+  }
+}
+    `;
+export type ResendVerificationCodeMutationFn = Apollo.MutationFunction<ResendVerificationCodeMutation, ResendVerificationCodeMutationVariables>;
+
+/**
+ * __useResendVerificationCodeMutation__
+ *
+ * To run a mutation, you first call `useResendVerificationCodeMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useResendVerificationCodeMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [resendVerificationCodeMutation, { data, loading, error }] = useResendVerificationCodeMutation({
+ *   variables: {
+ *      resendVerificationCodeInput: // value for 'resendVerificationCodeInput'
+ *   },
+ * });
+ */
+export function useResendVerificationCodeMutation(baseOptions?: Apollo.MutationHookOptions<ResendVerificationCodeMutation, ResendVerificationCodeMutationVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useMutation<ResendVerificationCodeMutation, ResendVerificationCodeMutationVariables>(ResendVerificationCodeDocument, options);
+      }
+export type ResendVerificationCodeMutationHookResult = ReturnType<typeof useResendVerificationCodeMutation>;
+export type ResendVerificationCodeMutationResult = Apollo.MutationResult<ResendVerificationCodeMutation>;
+export type ResendVerificationCodeMutationOptions = Apollo.BaseMutationOptions<ResendVerificationCodeMutation, ResendVerificationCodeMutationVariables>;
 export const CreateUserDocument = gql`
     mutation CreateUser($createUserInput: CreateUserInput!) {
   createUser(createUserInput: $createUserInput) {

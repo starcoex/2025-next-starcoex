@@ -21,9 +21,12 @@ import {
   LoginGraphqlMutationVariables,
 } from "@/generated/graphql";
 import toast from "react-hot-toast";
+import Cookies from "js-cookie";
+import { useRouter } from "next/navigation";
 
 const Login = () => {
-  const [login, { loading, error, data }] = useMutation<
+  const router = useRouter();
+  const [login, { loading, error }] = useMutation<
     LoginGraphqlMutation,
     LoginGraphqlMutationVariables
   >(LOGIN_GQL, { errorPolicy: "all" });
@@ -44,30 +47,35 @@ const Login = () => {
         },
       },
     });
-    console.log("response", response);
-
     try {
-      if (response.data?.loginGraphql.user) {
-        toast.success("로그인에 성공했습니다.");
-      } else {
-        console.log("+++++++");
-        toast.error(response.errors?.map((error) => error?.message));
+      if (!loading) {
+        if (response.data?.loginGraphql.user) {
+          toast.success("로그인에 성공했습니다.");
+          Cookies.set(
+            "access_token",
+            response.data?.loginGraphql.access_token as string,
+          );
+          Cookies.set(
+            "refresh_token",
+            response.data?.loginGraphql.refresh_token as string,
+          );
+          reset();
+          router.push("/");
+        } else if (!response.data?.loginGraphql.ok) {
+          toast.error(response.data?.loginGraphql.error);
+        } else {
+          toast.error(response.errors?.map((error) => error?.message));
+        }
+        reset();
       }
-      reset();
-    } catch (e) {
-      console.error(e);
+      // Bad Request Exception
+      console.log(response);
+    } catch (error: any) {
+      toast.error(error.message);
     }
   };
-  if (loading) return <span>Loading...</span>;
   return (
     <main className="overflow-hidden">
-      <pre>
-        <div> {error?.message}</div>
-        Bad:{" "}
-        {error?.graphQLErrors.map(({ message }, index) => (
-          <span key={index}>{message}</span>
-        ))}
-      </pre>
       <div className="isolate flex min-h-dvh items-center justify-center p-6 lg:p-8">
         <div className="w-full max-w-md rounded-xl bg-white shadow-md ring-1 ring-black/5">
           <form
@@ -99,11 +107,8 @@ const Login = () => {
                 )}
               />
             </Field>
-            {/*{errors.email && <FetchError message={errors.email.message} />}*/}
-            {/*{error?.message && <FetchError message={error?.message} />}*/}
-            {error?.graphQLErrors.map(
-              (error) => error?.extensions?.code === "INTERNAL_SERVER_ERROR",
-            ) && <FetchError message={error?.message} />}
+            {errors.email && <FetchError message={errors.email.message} />}
+            {error?.message && <FetchError message={error?.message} />}
 
             <Field className="mt-8 space-y-3 relative">
               <Label className="text-sm/5 font-medium">Password</Label>
@@ -135,9 +140,7 @@ const Login = () => {
             {errors.password && (
               <FetchError message={errors.password.message} />
             )}
-            {error?.graphQLErrors.map(
-              (error) => error?.extensions?.code === "UNAUTHENTICATED",
-            ) && <FetchError message={error?.message} />}
+            {error?.message && <FetchError message={error?.message} />}
 
             <div className="mt-8 flex items-center justify-between text-sm/5">
               <Field className="flex items-center gap-3">

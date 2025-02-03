@@ -5,6 +5,10 @@ export const CONFIRM_EMAIL_GQL = gql`
     verifyEmailGql(verifyEmailInput: $verifyEmailInput) {
       ok
       error
+      user {
+        name
+        email
+      }
     }
   }
 `;

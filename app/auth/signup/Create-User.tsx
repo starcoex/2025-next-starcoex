@@ -6,63 +6,67 @@ import { clsx } from "clsx";
 import { AiOutlineEye, AiOutlineEyeInvisible } from "react-icons/ai";
 import { useMutation } from "@apollo/client";
 import {
-  CreateUserMutation,
-  CreateUserMutationVariables,
+  CreateUserGqlMutation,
+  CreateUserGqlMutationVariables,
 } from "@/generated/graphql";
-import { CREATE_USER } from "@/app/graphql/gateway/create-user";
 import { useForm } from "react-hook-form";
-
 import { zodResolver } from "@hookform/resolvers/zod";
 import toast from "react-hot-toast";
-import { z } from "zod";
-
-const formSchema = z.object({
-  name: z.string().min(3, "Name must be at least 3 characters long!"),
-  email: z.string().email(),
-  phone_number: z.string(),
-  password: z.string().min(8, "Password must be at least 8characters long!"),
-  password_confirm: z.string().trim(),
-});
-
-type SignUpSchema = z.infer<typeof formSchema>;
+import {
+  CreateUserInput,
+  createUserSchema,
+} from "@/app/auth/signup/schemas/create-user";
+import { CREATE_USER_GQL } from "@/app/graphql/authGql/create-user-gql";
+import { useRouter } from "next/navigation";
+import { Button } from "@/app/components/Button";
+import FetchError from "@/app/components/FetchError";
 
 const CreateUser = () => {
   const [show, setShow] = useState(false);
-  // const [state, formAction] = useActionState(createUser, null);
-
+  const router = useRouter();
   const [createUserMutation, { loading }] = useMutation<
-    CreateUserMutation,
-    CreateUserMutationVariables
-  >(CREATE_USER);
-
+    CreateUserGqlMutation,
+    CreateUserGqlMutationVariables
+  >(CREATE_USER_GQL);
   const {
     register,
     handleSubmit,
     formState: { errors, isSubmitting },
     reset,
-  } = useForm<SignUpSchema>({ resolver: zodResolver(formSchema) });
+  } = useForm<CreateUserInput>({
+    resolver: zodResolver(createUserSchema),
+  });
 
-  const onSubmit = async (data: SignUpSchema) => {
-    console.log(data);
-    try {
-      if (!loading) {
-        const response = await createUserMutation({
-          variables: {
-            createUserInput: {
-              email: data.email,
-              password: data.password,
-              passwordConfirmation: data.password_confirm,
-              phone_number: data.phone_number,
-              name: data.name,
-            },
-          },
-        });
-        console.log("response", response);
+  const onSubmit = async (data: CreateUserInput) => {
+    const response = await createUserMutation({
+      variables: {
+        createUserInput: {
+          email: data.email,
+          password: data.password,
+          passwordConfirmation: data.password_confirm,
+          phone_number: data.phone_number,
+          name: data.name,
+        },
+      },
+    });
+    if (!loading) {
+      if (response.data?.createUserGql.user) {
+        localStorage.setItem(
+          "activation_token",
+          response.data.createUserGql.activation_token as string,
+        );
+        localStorage.setItem(
+          "user_email",
+          response.data.createUserGql.user.email,
+        );
+        toast.success("User created successfully.");
+        router.push("/auth/confirm-email");
       }
-    } catch (err: any) {
-      console.log("error", err);
-      toast.error(err.message);
+      if (response.data?.createUserGql.error) {
+        toast.error(response.data.createUserGql.error);
+      }
     }
+    reset();
   };
   return (
     <main className="overflow-hidden">
@@ -92,8 +96,8 @@ const CreateUser = () => {
                   "data-[focus]:outline data-[focus]:outline-2 data-[focus]:-outline-offset-1 data-[focus]:outline-black",
                 )}
               />
-              <span>{errors.email?.message}</span>
             </div>
+            {errors.email && <FetchError message={errors.email?.message} />}
             <div className="mt-8 space-y-3">
               <label className="text-sm/5 font-medium">Name</label>
               <input
@@ -108,8 +112,9 @@ const CreateUser = () => {
                   "data-[focus]:outline data-[focus]:outline-2 data-[focus]:-outline-offset-1 data-[focus]:outline-black",
                 )}
               />
-              <span>{errors.name?.message}</span>
             </div>
+            {errors.name && <FetchError message={errors.name?.message} />}
+
             <div className="mt-8 space-y-3">
               <label className="text-sm/5 font-medium">Phone</label>
               <input
@@ -124,8 +129,11 @@ const CreateUser = () => {
                   "data-[focus]:outline data-[focus]:outline-2 data-[focus]:-outline-offset-1 data-[focus]:outline-black",
                 )}
               />
-              <span>{errors.phone_number?.message}</span>
             </div>
+            {errors.phone_number && (
+              <FetchError message={errors.phone_number?.message} />
+            )}
+
             <div className="mt-8 space-y-3 relative">
               <label className="text-sm/5 font-medium">Password</label>
               <input
@@ -152,8 +160,10 @@ const CreateUser = () => {
                   onClick={() => setShow(false)}
                 />
               )}
-              <span>{errors.password?.message}</span>
             </div>
+            {errors.password && (
+              <FetchError message={errors.password?.message} />
+            )}
             <div className="mt-8 space-y-3 relative">
               <label className="text-sm/5 font-medium">Password-Confirm</label>
               <input
@@ -180,12 +190,18 @@ const CreateUser = () => {
                   onClick={() => setShow(false)}
                 />
               )}
-              <span>{errors.password_confirm?.message}</span>
             </div>
+            {errors.password_confirm && (
+              <FetchError message={errors.password_confirm?.message} />
+            )}
             <div className="mt-8">
-              <button type="submit" className="w-full">
+              <Button
+                type="submit"
+                disabled={isSubmitting || loading}
+                className="w-full"
+              >
                 가입하기
-              </button>
+              </Button>
             </div>
           </form>
           <div className="m-1.5 rounded-lg bg-gray-50 py-4 text-center text-sm/5 ring-1 ring-black/5">

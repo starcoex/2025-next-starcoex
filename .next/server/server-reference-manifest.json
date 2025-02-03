@@ -1,5 +1,17 @@
 {
-  "node": {},
+  "node": {
+    "7fc66fba8eb23679add9243689eefcf13c8ce26a61": {
+      "workers": {
+        "app/users/page": {
+          "moduleId": "(rsc)/./node_modules/next/dist/build/webpack/loaders/next-flight-action-entry-loader.js?actions=%5B%5B%22%2FUsers%2Fjeonghoonko%2FDocuments%2F2025%2Fnextjs%2Fstart-starcoex-frontend%2Fapp%2Flib%2Fget-user.ts%22%2C%5B%5B%227fc66fba8eb23679add9243689eefcf13c8ce26a61%22%2C%22default%22%5D%5D%5D%5D&__client_imported__=!",
+          "async": false
+        }
+      },
+      "layer": {
+        "app/users/page": "rsc"
+      }
+    }
+  },
   "edge": {},
-  "encryptionKey": "0YO00AozNjqVolF+CCINHjZPDWVO/YtxRZN1Jtjm1Z4="
+  "encryptionKey": "3htsXOdJgiKj0SQfD1XDP0jyUt1UUR2d23mPniYv2D0="
 }

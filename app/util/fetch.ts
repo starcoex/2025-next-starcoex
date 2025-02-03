@@ -7,9 +7,14 @@ const getHeaders = () => ({
 });
 
 export const post = async (path: string, formData: FormData) => {
+  const cookieStore = await cookies();
+
   const response = await fetch(`${API_AUTH_URL}${path}`, {
     method: "POST",
-    headers: { "Content-Type": "application/json", ...getHeaders() },
+    headers: {
+      "Content-Type": "application/json",
+      Cookie: cookieStore.toString(),
+    },
     body: JSON.stringify(formData),
   });
   if (!response.ok) {
@@ -23,4 +28,13 @@ export const post = async (path: string, formData: FormData) => {
     }
   }
   return { error: "", statusCode: null };
+};
+
+export const get = async (path: string) => {
+  const cookieStore = await cookies();
+
+  const response = await fetch(`${API_AUTH_URL}${path}`, {
+    headers: { Cookie: cookieStore.toString() },
+  });
+  return response.json();
 };

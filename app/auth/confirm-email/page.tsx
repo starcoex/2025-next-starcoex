@@ -1,7 +1,8 @@
 import React from "react";
+import Verification from "@/app/auth/confirm-email/Verification";
 
 const ConfirmEmail = () => {
-  return <div>confirmEmail</div>;
+  return <Verification />;
 };
 
 export default ConfirmEmail;

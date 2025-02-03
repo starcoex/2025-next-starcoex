@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { cookies } from "next/headers";
 import { AUTH_COOKIE, REFRESH_COOKIE } from "@/app/constants/cookie";
 import { getAuthCookie } from "@/app/lib/auth-cookie";
+import { API_AUTH_URL } from "@/app/constants/api";
 
 interface Routes {
   [key: string]: boolean;
@@ -26,39 +27,31 @@ const unauthenticatedRoutes = [
 ];
 
 export async function middleware(request: NextRequest) {
-  const authenticated = !!(await cookies()).get(AUTH_COOKIE)?.value;
-  const existsUrl = publicOnlyUrls[request.nextUrl.pathname];
-  if (!authenticated && (await cookies()).get(REFRESH_COOKIE)) {
-    const refreshRes = await fetch(`${process.env.API_URL}/auth/refresh`, {
+  const cookieStore = await cookies();
+
+  const authenticated = !!cookieStore.get(AUTH_COOKIE)?.value;
+  if (!authenticated && cookieStore.get(REFRESH_COOKIE)) {
+    const refreshRes = await fetch(`${API_AUTH_URL}/auth/refresh`, {
       headers: {
-        Cookie: cookies().toString(),
+        Cookie: cookieStore.toString(),
       },
       method: "POST",
     });
     const authCookies = getAuthCookie(refreshRes);
-    if (authCookies?.accessToken) {
+    if (authCookies?.access_token) {
       const response = NextResponse.redirect(request.url);
-      response.cookies.set(authCookies.accessToken);
+      response.cookies.set(authCookies.access_token);
       return response;
     }
   }
-
   if (
     !authenticated &&
     !unauthenticatedRoutes.some((route) =>
       request.nextUrl.pathname.startsWith(route),
     )
   ) {
-    return Response.redirect(new URL("/", request.url));
+    return Response.redirect(new URL("/auth/loginAction", request.url));
   }
-
-  // if (!authenticated) {
-  //   if (!existsUrl) {
-  //     return Response.redirect(new URL("/", request.url));
-  //   } else if (existsUrl) {
-  //     return Response.redirect(new URL("/blog", request.url));
-  //   }
-  // }
 }
 
 export const config = {
